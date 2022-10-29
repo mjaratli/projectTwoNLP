@@ -4,6 +4,19 @@ import collections
 import sys
 
 
+# # Grab the tags that can potentially occur per word in the line
+# tags_per_word = []
+# for element in line:
+#     tags_per_element = [element]
+#     for keyOne, keyTwo in lex_prob:
+#         if keyOne == element:
+#             tags_per_element.append(keyTwo)
+#     # If there are no tags, default tag is Noun (NN)
+#     if len(tags_per_element) == 1:
+#         tags_per_element.append('NN')
+#     tags_per_word.append(tags_per_element)
+
+
 # Helps split elements when processing the train and test file
 def split_elements(element):
     # If statement to split these occurrences in training file: 1\/2/CD
@@ -98,10 +111,12 @@ def viterbi(bi_prob, lex_prob, line):
     tags_per_word = []
     for element in line:
         tags_per_element = [element]
-        for keyOne, keyTwo in lex_prob:
-            if keyOne == element:
-                tags_per_element.append(keyTwo)
+        tags_per_element += [keyTwo for keyOne, keyTwo in lex_prob if keyOne == element]
+        if len(tags_per_element) == 1:
+            tags_per_element.append('NN')
         tags_per_word.append(tags_per_element)
+
+    # Initialization step
 
     return 0
 
