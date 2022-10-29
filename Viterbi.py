@@ -85,12 +85,51 @@ def collect_prob(word_tag_p, two_tags_p, tags_p):
     bigram_prob = {}
     # Calculating the bigram probabilities
     for keyOne, keyTwo in two_tags_p:
-        bigram_input = (f"{keyOne}", f"{keyTwo}")
-        count_tag_tag = two_tags_p[keyTwo, keyOne]
+        bigram_input = (f"{keyTwo}", f"{keyOne}")
+        count_tag_tag = two_tags_p[keyOne, keyTwo]
         count_tag = tags_p[keyTwo]
         bigram_prob[bigram_input] = count_tag_tag / count_tag
 
     return bigram_prob, lexical_prob
+
+
+def viterbi(bi_prob, lex_prob, line):
+    # Grab the tags that can potentially occur per word in the line
+    tags_per_word = []
+    for element in line:
+        tags_per_element = [element]
+        for keyOne, keyTwo in lex_prob:
+            if keyOne == element:
+                tags_per_element.append(keyTwo)
+        tags_per_word.append(tags_per_element)
+
+    return 0
+
+
+def process_test(bigram_p, lexical_p, fileName):
+    predictions = []
+    # tagValues grabs the gold standard tags from each line while tagValuesGS is the gold standard tag values for the
+    # entire test file
+    tagValuesGS = []
+
+    # Opening the test file to grab line by line
+    with open(fileName, 'r') as testFile:
+        # Grab each line
+        for line in testFile:
+            # Split line by space delimiter into an array
+            eachLine = line.split()
+            tagValues = []
+            # Remove the tags from each element, store the tags, and update eachLine to only hold the words of the line
+            for index, element in enumerate(eachLine):
+                if index < len(eachLine):
+                    word, tag = split_elements(element)
+                    eachLine[index] = word
+                    tagValues.append(tag)
+            tagValuesGS.append(tagValues)
+            # Run the viterbi algorithm on each line
+            viterbi(bigram_p, lexical_p, eachLine)
+
+    return predictions
 
 
 # Call the text pre-processing function and return a processed list
@@ -107,3 +146,5 @@ if len(sys.argv) >= 3:
 word_tag_result, two_tags_result, tags_result = process_train(arg)
 # Calculate the bigram P(N given V) probabilities and the lexical P(a given DT) probabilities
 bigram_probabilities, lexical_probabilities = collect_prob(word_tag_result, two_tags_result, tags_result)
+# Run the Viterbi Algorithm
+predicted_tags = process_test(bigram_probabilities, lexical_probabilities, arg2)
