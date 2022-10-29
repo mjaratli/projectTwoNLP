@@ -15,6 +15,12 @@ import sys
 #     if len(tags_per_element) == 1:
 #         tags_per_element.append('NN')
 #     tags_per_word.append(tags_per_element)
+class Word:
+    def __init__(self, word, tag, score, backptr):
+        self.word = word
+        self.tag = tag
+        self.score = score
+        self.backptr = backptr
 
 
 # Helps split elements when processing the train and test file
@@ -116,9 +122,42 @@ def viterbi(bi_prob, lex_prob, line):
             tags_per_element.append('NN')
         tags_per_word.append(tags_per_element)
 
-    # Initialization step
+    # The final array is a 2 dimensional array with each element containing
+    # word, tag, score, and a back-ptr
+    fa_element = []
+    final_array = []
+
+    for row in range(len(tags_per_word)):
+        fa_element = []
+        # Assigning the word to each element
+        word = tags_per_word[row][0]
+        fa_element.append(word)
+        for col in range(len(tags_per_word[row])):
+            score = 0
+            # If it is the first word
+            if row == 0 and col > 0:
+                backptr = 0
+                tag = tags_per_word[row][col]
+                # l_prob = lex_prob.get([word, tag], 0)
+                # b_prob = bi_prob.get([tag, 'SOF'], 0)
+                try:
+                    score = lex_prob[word, tag] * bi_prob[tag, 'SOF']
+                except KeyError:
+                    score = 1
+                fa_element.append(tag)
+                fa_element.append(score)
+                fa_element.append(backptr)
+                final_array.append(fa_element)
+            fa_element = fa_element[:1]
 
     return 0
+
+    # # Initialization step
+    # for index, element in enumerate(tags_per_word[0]):
+    #     firstWord = tags_per_word[0][0]
+    #     fa_element.append(firstWord)
+    #     fa_element.append(tags_per_word[0][index])
+    #     hi = 5
 
 
 def process_test(bigram_p, lexical_p, fileName):
