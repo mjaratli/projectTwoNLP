@@ -221,11 +221,11 @@ def viterbi(bi_prob, lex_prob, line):
 
 
 def process_test(bigram_p, lexical_p, fileName):
-    system_predictions = 0
-    total = 0
     # tagValues grabs the gold standard tags from each line while tagValuesGS is the gold standard tag values for the
     # entire test file
     tagValuesGS = []
+    tagValuesSYS = []
+    wordsGS = []
 
     # Opening the test file to grab line by line
     with open(fileName, 'r') as testFile:
@@ -240,17 +240,23 @@ def process_test(bigram_p, lexical_p, fileName):
                     word, tag = split_elements(element)
                     eachLine[index] = word
                     tagValues.append(tag)
-            # tagValuesGS.append(tagValues)
+            wordsGS.append(eachLine)
+            tagValuesGS.append(tagValues)
             # Run the viterbi algorithm on each line
             tested_results = viterbi(bigram_p, lexical_p, eachLine)
+            if tested_results[0] == 0:
+                tested_results.remove(0)
+            tagValuesSYS.append(tested_results)
 
-            # Get system predication counts and total counts
-            for index, element in enumerate(tested_results):
-                if element == tagValues[index]:
-                    system_predictions += 1
-                total += 1
+        system_predictions = 0
+        total = 1
+        # # Get system predication counts and total counts
+        # for index, element in enumerate(tested_results):
+        #     if element == tagValues[index]:
+        #         system_predictions += 1
+        #     total += 1
 
-    return system_predictions, total
+    return wordsGS, tagValuesGS, tagValuesSYS
 
 
 # Call the text pre-processing function and return a processed list
@@ -268,7 +274,21 @@ word_tag_result, two_tags_result, tags_result = process_train(arg)
 # Calculate the bigram P(N given V) probabilities and the lexical P(a given DT) probabilities
 bigram_probabilities, lexical_probabilities = collect_prob(word_tag_result, two_tags_result, tags_result)
 # Run the Viterbi Algorithm
-sys_predictions, total_tags = process_test(bigram_probabilities, lexical_probabilities, arg2)
+wordsGs, tagValuesGs, tagValuesSYs = process_test(bigram_probabilities, lexical_probabilities, arg2)
+
+sys_predictions = 0
+total_tags = 0
+# Write to outFile predicted results for POS.test
+with open('POS.test.out', 'w') as test_file_results:
+    for row in range(len(wordsGs)):
+        if row != 0:
+            test_file_results.write('\n')
+        for col in range(len(wordsGs[row])):
+            test_file_results.write(wordsGs[row][col] + '/' + tagValuesSYs[row][col] + ' ')
+            if tagValuesGs[row][col] == tagValuesSYs [row][col]:
+                sys_predictions += 1
+            total_tags += 1
 # Calculate the accuracy
-accuracy = (sys_predictions/total_tags) * 100
-hi = 5
+accuracy = (sys_predictions / total_tags) * 100
+print(accuracy)
+
