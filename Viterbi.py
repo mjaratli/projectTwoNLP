@@ -26,19 +26,19 @@ import sys
 #     fa_element.append(firstWord)
 #     fa_element.append(tags_per_word[0][index])
 #     hi = 5
-class Word:
-    def __init__(self, word, tag, score, backptr):
-        self.word = word
-        self.tag = tag
-        self.score = score
-        self.backptr = backptr
+# class Word:
+#     def __init__(self, word, tag, score, backptr):
+#         self.word = word
+#         self.tag = tag
+#         self.score = score
+#         self.backptr = backptr
 
 
 # Helps split elements when processing the train and test file
 def split_elements(element):
     # Accounts for errors in the POS.train.large file. Ex. 48705. no / and no tag
     if '/' not in element:
-        return 'none', 'none'
+        return element, 'NN'
     # If statement to split these occurrences in training file: 1\/2/CD
     backslash = '\\'
     if backslash in element:
