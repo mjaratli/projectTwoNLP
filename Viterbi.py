@@ -36,6 +36,9 @@ class Word:
 
 # Helps split elements when processing the train and test file
 def split_elements(element):
+    # Accounts for errors in the POS.train.large file. Ex. 48705. no / and no tag
+    if '/' not in element:
+        return 'none', 'none'
     # If statement to split these occurrences in training file: 1\/2/CD
     backslash = '\\'
     if backslash in element:
@@ -73,6 +76,8 @@ def process_train(fileName):
                     next_element = (eachLine[index + 1])
                     current_word, current_tag = split_elements(current_element)
                     next_word, next_tag = split_elements(next_element)
+                    if current_word == 'none' or next_word == 'none':
+                        break
                     # Tags
                     tags[current_tag] += 1
                     # Two tags
@@ -248,14 +253,6 @@ def process_test(bigram_p, lexical_p, fileName):
                 tested_results.remove(0)
             tagValuesSYS.append(tested_results)
 
-        system_predictions = 0
-        total = 1
-        # # Get system predication counts and total counts
-        # for index, element in enumerate(tested_results):
-        #     if element == tagValues[index]:
-        #         system_predictions += 1
-        #     total += 1
-
     return wordsGS, tagValuesGS, tagValuesSYS
 
 
@@ -285,10 +282,9 @@ with open('POS.test.out', 'w') as test_file_results:
             test_file_results.write('\n')
         for col in range(len(wordsGs[row])):
             test_file_results.write(wordsGs[row][col] + '/' + tagValuesSYs[row][col] + ' ')
-            if tagValuesGs[row][col] == tagValuesSYs [row][col]:
+            if tagValuesGs[row][col] == tagValuesSYs[row][col]:
                 sys_predictions += 1
             total_tags += 1
 # Calculate the accuracy
 accuracy = (sys_predictions / total_tags) * 100
 print(accuracy)
-
