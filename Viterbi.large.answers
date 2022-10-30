@@ -1,0 +1,11 @@
+# Important Notes
+If words in the test set were not available in the training set, their tags were set to "NN" (noun).
+My program takes about 20-30 seconds to run and I was testing it on a macbookAir with an M1 chip.
+I'm not sure how it will perform on other machines.
+
+# Program completeness
+My program is complete and runs with no errors.
+
+# Accuracy Results
+My accuracy results on the test data using the Viterbi program is 78.04%
+My accuracy results on the test data using the Baseline program is 88.25%

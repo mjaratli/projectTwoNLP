@@ -1,0 +1,38 @@
+# Important Notes
+If words in the test set were not available in the training set, their tags were set to "NN" (noun).
+My program takes about 20-30 seconds to run and I was testing it on a macbookAir with an M1 chip.
+I'm not sure how it will perform on other machines.
+
+# Program completeness
+My program is complete and runs with no errors.
+
+# Accuracy Results
+My accuracy results on the test data using the Viterbi program is 82.45%
+My accuracy results on the test data using the Baseline program is 85.52%
+
+# Error number one
+test set word : 56.2
+test set tag: CD
+predicted tag by Viterbi: NN
+The reason that this error occurs is because the word 56.2 is not in the training set.
+The word 56.2 is a number, so the tag CD is assigned to it.
+However, the word 56.2 is not in the training set, so the tag NN is assigned to it by the Viterbi program.
+This can be fixed by checking if the word is a number, and if it is, assign the tag CD to it in the Viterbi program.
+
+# Error number two
+test set word : Athens
+test set tag: NP
+predicted tag by Viterbi: NN
+The reason that this error occurs is because the word Athens is not in the training set.
+The word Athens is a proper noun, so its correct tag is NP. Since the word Athens is not
+in the training set, the tag NN is assigned to it by the Viterbi program.
+This can be fixed by checking if the word is capitalized and not in the start of a sentence, and if it is,
+assign the tag NP to it in the Viterbi program.
+
+# Error number three
+test set word : more
+test set tag: RBR
+predicted tag by Viterbi: RBR|JJR
+The reason that this occurs is because the word more is tagged as RBR or JJR in the training set.
+This causes an issue because it is unlikely for more to be tagged twice in another occurrence, especially in the test set.
+This can be fixed by separating the tags when processing the training set.

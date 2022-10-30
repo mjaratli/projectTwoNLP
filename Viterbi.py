@@ -3,37 +3,6 @@ import string
 import collections
 import sys
 
-
-# # Grab the tags that can potentially occur per word in the line
-# tags_per_word = []
-# for element in line:
-#     tags_per_element = [element]
-#     for keyOne, keyTwo in lex_prob:
-#         if keyOne == element:
-#             tags_per_element.append(keyTwo)
-#     # If there are no tags, default tag is Noun (NN)
-#     if len(tags_per_element) == 1:
-#         tags_per_element.append('NN')
-#     tags_per_word.append(tags_per_element)
-
-# # Store the tags of the current word
-#             prev_tags = []
-#             if col > 0:
-#                 prev_tags.append(tags_per_word[row][col])
-# # Initialization step
-# for index, element in enumerate(tags_per_word[0]):
-#     firstWord = tags_per_word[0][0]
-#     fa_element.append(firstWord)
-#     fa_element.append(tags_per_word[0][index])
-#     hi = 5
-# class Word:
-#     def __init__(self, word, tag, score, backptr):
-#         self.word = word
-#         self.tag = tag
-#         self.score = score
-#         self.backptr = backptr
-
-
 # Helps split elements when processing the train and test file
 def split_elements(element):
     # Accounts for errors in the POS.train.large file. Ex. 48705. no / and no tag
