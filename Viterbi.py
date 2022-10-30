@@ -15,6 +15,11 @@ import sys
 #     if len(tags_per_element) == 1:
 #         tags_per_element.append('NN')
 #     tags_per_word.append(tags_per_element)
+
+# # Store the tags of the current word
+#             prev_tags = []
+#             if col > 0:
+#                 prev_tags.append(tags_per_word[row][col])
 class Word:
     def __init__(self, word, tag, score, backptr):
         self.word = word
@@ -128,26 +133,60 @@ def viterbi(bi_prob, lex_prob, line):
     final_array = []
 
     for row in range(len(tags_per_word)):
+        # Reset the fa_element
         fa_element = []
         # Assigning the word to each element
         word = tags_per_word[row][0]
         fa_element.append(word)
         for col in range(len(tags_per_word[row])):
             score = 0
-            # If it is the first word
+            # Initialization step : If it is the first word
             if row == 0 and col > 0:
                 backptr = 0
                 tag = tags_per_word[row][col]
                 # l_prob = lex_prob.get([word, tag], 0)
                 # b_prob = bi_prob.get([tag, 'SOF'], 0)
                 try:
-                    score = lex_prob[word, tag] * bi_prob[tag, 'SOF']
+                    score = math.log2(lex_prob[word, tag] + 1) * math.log2(bi_prob[tag, 'SOF'] + 1)
                 except KeyError:
                     score = 1
                 fa_element.append(tag)
                 fa_element.append(score)
                 fa_element.append(backptr)
                 final_array.append(fa_element)
+            # Iteration step
+            if row > 0 and col > 0:
+                prev_tags = tags_per_word[row - 1][1:]
+                # Need to change this to a dictionary
+                previous_score = final_array[row - 1][2]
+                current_tag = tags_per_word[row][col]
+                try:
+                    tagt_given_tagj = bi_prob[current_tag, prev_tags[0]]
+                except KeyError:
+                    tagt_given_tagj = 1
+                max_score = math.log2(previous_score + 1) * math.log2(tagt_given_tagj + 1)
+                backptr = prev_tags[0]
+
+                for prev_tag in prev_tags:
+                    try:
+                        tagt_given_tagj = bi_prob[current_tag, prev_tag]
+                    except KeyError:
+                        tagt_given_tagj = 1
+                    max_score_compare = math.log2(previous_score + 1) * math.log2(tagt_given_tagj + 1)
+                    if max_score < max_score_compare:
+                        max_score = max_score_compare
+                        backptr = prev_tag
+
+                fa_element.append(current_tag)
+                try:
+                    prob_word_given_tag = math.log2(lex_prob[word, current_tag] + 1)
+                except KeyError:
+                    prob_word_given_tag = 1
+                score = prob_word_given_tag * max_score
+                fa_element.append(score)
+                fa_element.append(backptr)
+                final_array.append(fa_element)
+
             fa_element = fa_element[:1]
 
     return 0
