@@ -131,6 +131,8 @@ def viterbi(bi_prob, lex_prob, line):
     # word, tag, score, and a back-ptr
     fa_element = []
     final_array = []
+    # Stores tag,word score pairs used in the iteration step of Viterbi
+    scores_dict = {}
 
     for row in range(len(tags_per_word)):
         # Reset the fa_element
@@ -154,11 +156,13 @@ def viterbi(bi_prob, lex_prob, line):
                 fa_element.append(score)
                 fa_element.append(backptr)
                 final_array.append(fa_element)
+                scores_dict[tag, word] = score
             # Iteration step
             if row > 0 and col > 0:
                 prev_tags = tags_per_word[row - 1][1:]
                 # Need to change this to a dictionary
-                previous_score = final_array[row - 1][2]
+                # previous_score = final_array[row - 1][2]
+                previous_score = scores_dict[prev_tags[0], tags_per_word[row - 1][0]]
                 current_tag = tags_per_word[row][col]
                 try:
                     tagt_given_tagj = bi_prob[current_tag, prev_tags[0]]
@@ -172,6 +176,7 @@ def viterbi(bi_prob, lex_prob, line):
                         tagt_given_tagj = bi_prob[current_tag, prev_tag]
                     except KeyError:
                         tagt_given_tagj = 1
+                    previous_score = scores_dict[prev_tag, tags_per_word[row - 1][0]]
                     max_score_compare = math.log2(previous_score + 1) * math.log2(tagt_given_tagj + 1)
                     if max_score < max_score_compare:
                         max_score = max_score_compare
@@ -186,6 +191,7 @@ def viterbi(bi_prob, lex_prob, line):
                 fa_element.append(score)
                 fa_element.append(backptr)
                 final_array.append(fa_element)
+                scores_dict[current_tag, word] = score
 
             fa_element = fa_element[:1]
 
